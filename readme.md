@@ -12,8 +12,7 @@ code is `9574`; a correct code plays `mp3/0004.mp3`.
 	- `DFRobotDFPlayerMini`
 	- `SoftwareSerial` (normally included with Arduino IDE)
 4. Connect the Arduino board by USB.
-5. Select the board in **Tools > Board**. The firmware is tested on Arduino
-	Uno, Leonardo, and Mega.
+5. Select the arduino **Nano** board in **Tools > Board**.
 6. Select the matching USB port in **Tools > Port**.
 7. Click **Upload**.
 8. Wait for **Done uploading**.
