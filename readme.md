@@ -57,3 +57,10 @@ This merges/removes the macOS hidden files. Eject the card with Finder before
 putting it back in the player.
 
 If the player still plays old files, delete the mp3 folder and copy fresh files
+
+## Resources
+
+- [DFPlayer - Mini MP3 Player](https://wiki.dfrobot.com/dfr0299/#tech_specs)
+- [Arduino Nano Doc](https://docs.arduino.cc/hardware/nano)
+- [Arduino Nano Schematic](https://docs.arduino.cc/resources/schematics/A000005-schematics.pdf)
+- [Arduino Nano pinout](https://docs.arduino.cc/resources/pinouts/A000005-full-pinout.pdf)
