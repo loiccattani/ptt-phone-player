@@ -30,19 +30,19 @@ unsigned long lastLiftDebounceTime = 0;
 // Debounce dial contact
 int dialContactState = HIGH;
 int lastDialContactState = HIGH;
-unsigned long lastDialDebounceTime = 0;
+volatile unsigned long lastDialDebounceTime = 0;
 
 // Debounce pulse contact
 int pulseContactState = LOW;
 int lastPulseContactState = LOW;
-unsigned long lastPulseDebounceTime = 0;
+volatile unsigned long lastPulseDebounceTime = 0;
 
-unsigned int pulseCount = 0;
+volatile unsigned int pulseCount = 0;
 unsigned int inputCount = 0;
 unsigned long code = 0;
 
-bool dialStarted = false;
-bool dialEnded = false;
+volatile bool dialStarted = false;
+volatile bool dialEnded = false;
 bool shouldStartTone = false;
 bool shouldStopAnyAudio = false;
 
@@ -97,17 +97,32 @@ void loop()
     myDFPlayer.stop();
   }
 
-  if (dialStarted) {
+  bool currentDialStarted;
+  noInterrupts();
+  currentDialStarted = dialStarted;
+  interrupts();
+
+  if (currentDialStarted) {
     myDFPlayer.stop();
   }
 
+  bool currentDialEnded = false;
+  unsigned int dialedPulseCount = 0;
+  noInterrupts();
   if (dialEnded) {
     dialStarted = false;
     dialEnded = false;
-    Serial.print(F("Dialed "));Serial.println(pulseCount % 10);
+    dialedPulseCount = pulseCount;
+    pulseCount = 0;
+    currentDialEnded = true;
+  }
+  interrupts();
+
+  if (currentDialEnded) {
+    Serial.print(F("Dialed "));Serial.println(dialedPulseCount % 10);
 
     inputCount++;
-    code = code * 10 + pulseCount % 10;
+    code = code * 10 + dialedPulseCount % 10;
 
     if (inputCount == 4) {
        // Test the code
@@ -120,9 +135,6 @@ void loop()
        inputCount = 0;
        code = 0;
     }
-
-    // Reset the pulse count
-    pulseCount = 0;
   }
   
   if (myDFPlayer.available()) {
@@ -141,11 +153,13 @@ void handleLift() {
       shouldStartTone = true;
     } else {
       // Hang up, reset all
+      noInterrupts();
       pulseCount = 0;
-      inputCount = 0;
-      code = 0;
       dialStarted = false;
       dialEnded = false;
+      interrupts();
+      inputCount = 0;
+      code = 0;
       shouldStopAnyAudio = true;
     }
     lastLiftContactState = currentState;
