@@ -142,6 +142,8 @@ void handleLift() {
     } else {
       // Hang up, reset all
       pulseCount = 0;
+      inputCount = 0;
+      code = 0;
       dialStarted = false;
       dialEnded = false;
       shouldStopAnyAudio = true;
