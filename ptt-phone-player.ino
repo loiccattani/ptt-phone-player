@@ -43,6 +43,7 @@ unsigned long code = 0;
 
 volatile bool dialStarted = false;
 volatile bool dialEnded = false;
+volatile bool dialEnabled = false;
 bool shouldStartTone = false;
 bool shouldStopAnyAudio = false;
 
@@ -151,9 +152,11 @@ void handleLift() {
     Serial.print("L");Serial.println(currentState);
     if (currentState == LOW) {
       shouldStartTone = true;
+      dialEnabled = true;
     } else {
       // Hang up, reset all
       noInterrupts();
+      dialEnabled = false;
       pulseCount = 0;
       dialStarted = false;
       dialEnded = false;
@@ -171,9 +174,10 @@ void handleDial() {
   unsigned long now = millis();
 
   if ((now - lastDialDebounceTime) > DEBOUNCE_DELAY) {
-    if (pulseCount > 0) {
+    if (dialEnabled && pulseCount > 0) {
       dialEnded = true;
     }
+
     lastDialDebounceTime = now;
   }
 }
@@ -182,9 +186,10 @@ void handlePulse() {
   unsigned long now = millis();
 
   if ((now - lastPulseDebounceTime) > DEBOUNCE_DELAY) {
-    if (digitalRead(DIAL_PIN) == LOW) {
+    if (dialEnabled && digitalRead(DIAL_PIN) == LOW) {
       dialStarted = true;
       pulseCount++;
+
       lastPulseDebounceTime = now;
     }
   }
